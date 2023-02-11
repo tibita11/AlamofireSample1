@@ -18,8 +18,9 @@ class DetailViewController: UIViewController {
     @IBOutlet weak var item3Label: UILabel!
     @IBOutlet weak var item3Value: UILabel!
     @IBOutlet weak var listTitle: UILabel!
-    
+    /// MainVCから渡されたデータ
     var data: Displayable?
+    /// TableViewに表示するデータ
     var listData: [Any] = []
     @IBOutlet weak var listTableView: UITableView!
     
@@ -45,6 +46,7 @@ class DetailViewController: UIViewController {
 }
 
 extension DetailViewController {
+    /// listItemsの内容を取得する
     private func fetch< T : Decodable & Displayable >(_ list: [String], of: T.Type) {
         var items: [T] = []
         // 非同期処理完了後に実行するため
@@ -66,14 +68,16 @@ extension DetailViewController {
             self?.listTableView.reloadData()
         }
     }
-    
+    /// listItemsの内容を取得する
     func fetchList() {
         guard let data = data else { return }
         switch data {
         case is Film:
             fetch(data.listItems, of: Starship.self)
+        case is Starship:
+            fetch(data.listItems, of: Film.self)
         default:
-            //
+            // データタイプを文字列で表示する
             print("Unkown type: ", String(describing: type(of: data)))
         }
     }
@@ -93,6 +97,9 @@ extension DetailViewController: UITableViewDelegate, UITableViewDataSource {
         var config = cell.defaultContentConfiguration()
         if let starship = listData[indexPath.row] as? Starship {
             config.text = starship.name
+        }
+        if let film = listData[indexPath.row] as? Film {
+            config.text = film.title
         }
         
         cell.contentConfiguration = config
